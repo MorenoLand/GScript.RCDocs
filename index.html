@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>RC Protocol Documentation</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+  <meta name="description" content="RC Protocol Documentation">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify@4/lib/themes/vue.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+  <style>
+    :root {
+      --theme-color: #4a9eff;
+      --sidebar-width: 300px;
+    }
+    body {
+      background: #1e1e1e !important;
+      color: #d4d4d4 !important;
+      font-size: 16px !important;
+      line-height: 1.7 !important;
+    }
+    .sidebar {
+      background: linear-gradient(180deg, #252525 0%, #2a2a2a 100%) !important;
+      border-right: 2px solid #3a3a3a !important;
+      padding: 1.5rem 1rem !important;
+      pointer-events: auto !important;
+      overflow-y: auto !important;
+      overflow-x: hidden !important;
+      height: 100vh !important;
+      position: fixed !important;
+    }
+    .sidebar ul {
+      list-style: none !important;
+      padding-left: 0 !important;
+    }
+    .sidebar ul li {
+      margin: 0.5rem 0 !important;
+      padding-left: 0 !important;
+      position: relative !important;
+      list-style: none !important;
+    }
+    .sidebar ul li::before {
+      content: "▸" !important;
+      color: #4a9eff !important;
+      font-size: 0.9em !important;
+      position: absolute !important;
+      left: 1rem !important;
+      top: 0.75rem !important;
+      transition: all 0.2s !important;
+      line-height: 1 !important;
+      z-index: 1 !important;
+      pointer-events: none !important;
+    }
+    .sidebar ul {
+      pointer-events: auto !important;
+    }
+    .sidebar ul li {
+      pointer-events: auto !important;
+    }
+    .sidebar ul li.active::before {
+      content: "▶" !important;
+      color: #6ab0ff !important;
+    }
+    .sidebar ul li a {
+      color: #b0b0b0 !important;
+      padding: 0.5rem 0.75rem 0.5rem 2.25rem !important;
+      border-radius: 4px !important;
+      transition: all 0.2s !important;
+      text-decoration: none !important;
+      display: block !important;
+      line-height: 1.5 !important;
+      position: relative !important;
+      z-index: 10 !important;
+      pointer-events: auto !important;
+      cursor: pointer !important;
+      user-select: none !important;
+    }
+    .sidebar ul li a * {
+      display: inline !important;
+      pointer-events: none !important;
+    }
+    .sidebar a {
+      pointer-events: auto !important;
+      cursor: pointer !important;
+      position: relative !important;
+      z-index: 10 !important;
+    }
+    .sidebar a:hover {
+      text-decoration: none !important;
+    }
+    .sidebar ul li ul {
+      margin-left: 1rem !important;
+    }
+    .sidebar ul li.collapsed > ul {
+      display: none !important;
+    }
+    .sidebar ul li.active > ul {
+      display: block !important;
+    }
+    .sidebar ul li.has-children > a {
+      position: relative !important;
+      padding-right: 2.5rem !important;
+    }
+    .sidebar ul li.has-children > a::after {
+      content: "▾" !important;
+      position: absolute !important;
+      right: 1rem !important;
+      color: #6c757d !important;
+      font-size: 0.9em !important;
+      transition: transform 0.2s !important;
+    }
+    .sidebar ul li.has-children.collapsed > a::after {
+      transform: rotate(-90deg) !important;
+    }
+    .sidebar ul li.has-children.active > a::after {
+      color: #4a9eff !important;
+    }
+    .sidebar ul li a:hover {
+      color: #4a9eff !important;
+      background: #2a2a2a !important;
+      transform: translateX(4px) !important;
+    }
+    .sidebar ul li.active > a {
+      color: #4a9eff !important;
+      background: #2a2a2a !important;
+      font-weight: 600 !important;
+      border-left: 3px solid #4a9eff !important;
+      padding-left: 2rem !important;
+    }
+    .markdown-section {
+      background: #252525 !important;
+      color: #d4d4d4 !important;
+      padding: 0.5rem 3rem 2.5rem 3rem !important;
+      max-width: calc(100vw - 310px) !important;
+      width: 100% !important;
+      box-sizing: border-box !important;
+      overflow-x: hidden !important;
+    }
+    .content {
+      max-width: calc(100vw - 310px) !important;
+      width: 100% !important;
+      box-sizing: border-box !important;
+    }
+    #main {
+      max-width: calc(100vw - 310px) !important;
+      width: 100% !important;
+      box-sizing: border-box !important;
+      margin-top: 0 !important;
+      padding-top: 0 !important;
+    }
+    article {
+      margin-top: 0 !important;
+      padding-top: 0 !important;
+    }
+    .content {
+      margin-top: 0 !important;
+      padding-top: 0 !important;
+    }
+    .markdown-body {
+      max-width: calc(100vw - 310px) !important;
+      box-sizing: border-box !important;
+    }
+    .markdown-section hr {
+      border: none !important;
+      height: 1px !important;
+      margin: 3.5rem 0 !important;
+      background: linear-gradient(to right, transparent 0%, rgba(58, 58, 58, 0.5) 20%, rgba(91, 165, 255, 0.4) 50%, rgba(58, 58, 58, 0.5) 80%, transparent 100%) !important;
+      position: relative !important;
+    }
+    .markdown-section h1 {
+      color: #5ba5ff !important;
+      border-bottom: 2px solid rgba(91, 165, 255, 0.3) !important;
+      padding-bottom: 0.75rem !important;
+      margin-top: 1.5rem !important;
+      margin-bottom: 1.75rem !important;
+      padding-top: 0.5rem !important;
+      padding-left: 1.75rem !important;
+      position: relative !important;
+      font-weight: 600 !important;
+      line-height: 1.4 !important;
+    }
+    .markdown-section h1::before {
+      content: "#" !important;
+      position: absolute !important;
+      left: 0 !important;
+      top: 0.5rem !important;
+      color: #5ba5ff !important;
+      font-size: 1.2em !important;
+      opacity: 0.8 !important;
+      line-height: 1 !important;
+    }
+    .markdown-section h1:first-child {
+      margin-top: 0 !important;
+      padding-top: 0 !important;
+      margin-bottom: 1.5rem !important;
+    }
+    .markdown-section h2 {
+      color: #7bb5ff !important;
+      border-bottom: 1px solid rgba(122, 181, 255, 0.2) !important;
+      padding-bottom: 0.5rem !important;
+      margin-top: 3rem !important;
+      margin-bottom: 1.5rem !important;
+      padding-top: 0.75rem !important;
+      padding-left: 1.5rem !important;
+      position: relative !important;
+      font-weight: 500 !important;
+    }
+    .markdown-section h2::before {
+      content: "#" !important;
+      position: absolute !important;
+      left: 0 !important;
+      color: #7bb5ff !important;
+      font-size: 0.9em !important;
+      opacity: 0.7 !important;
+    }
+    .markdown-section h3 {
+      color: #9bc5ff !important;
+      border-bottom: 1px solid rgba(155, 197, 255, 0.15) !important;
+      padding-bottom: 0.4rem !important;
+      margin-top: 2.5rem !important;
+      margin-bottom: 1.25rem !important;
+      padding-left: 1.25rem !important;
+      position: relative !important;
+      font-weight: 500 !important;
+    }
+    .markdown-section h3::before {
+      content: "#" !important;
+      position: absolute !important;
+      left: 0 !important;
+      color: #9bc5ff !important;
+      font-size: 0.85em !important;
+      opacity: 0.6 !important;
+    }
+    .markdown-section h4 {
+      color: #a0c8ff !important;
+      margin-top: 2rem !important;
+      margin-bottom: 0.75rem !important;
+      padding-left: 1rem !important;
+      position: relative !important;
+    }
+    .markdown-section h4::before {
+      content: "#" !important;
+      position: absolute !important;
+      left: 0 !important;
+      color: #a0c8ff !important;
+      font-size: 0.8em !important;
+    }
+    .markdown-section > * {
+      margin-bottom: 1.5rem !important;
+    }
+    .markdown-section > p {
+      margin-bottom: 1.75rem !important;
+      line-height: 1.75 !important;
+    }
+    .markdown-section > ul,
+    .markdown-section > ol {
+      margin-bottom: 2rem !important;
+      line-height: 1.8 !important;
+    }
+    .markdown-section li {
+      margin-bottom: 0.5rem !important;
+    }
+    .markdown-section h2 + p,
+    .markdown-section h3 + p,
+    .markdown-section h4 + p {
+      margin-top: 0.75rem !important;
+    }
+    .markdown-section h2 + ul,
+    .markdown-section h2 + ol,
+    .markdown-section h3 + ul,
+    .markdown-section h3 + ol {
+      margin-top: 0.75rem !important;
+    }
+    .markdown-section code {
+      background: #2a2a3a !important;
+      color: #ff6b9d !important;
+      border: 1px solid #4a4a6a !important;
+      padding: 0.2em 0.4em !important;
+      border-radius: 3px !important;
+    }
+    .markdown-section pre {
+      background: #1e1e2e !important;
+      border: 1px solid rgba(74, 158, 255, 0.2) !important;
+      border-left: 4px solid rgba(91, 165, 255, 0.6) !important;
+      box-shadow: 0 2px 12px rgba(74, 158, 255, 0.08) !important;
+      border-radius: 6px !important;
+      padding: 1.25rem !important;
+      overflow-x: auto !important;
+      max-width: 100% !important;
+      width: calc(100% - 0px) !important;
+      box-sizing: border-box !important;
+    }
+    .markdown-section pre code {
+      white-space: pre !important;
+      display: block !important;
+      overflow-x: auto !important;
+      max-width: 100% !important;
+    }
+    .markdown-section pre code {
+      background: transparent !important;
+      color: #e0e0e0 !important;
+      border: none !important;
+      padding: 0 !important;
+      border-radius: 0 !important;
+    }
+    .markdown-section table th {
+      background: rgba(42, 42, 42, 0.8) !important;
+      color: #7bb5ff !important;
+      border-color: rgba(58, 58, 58, 0.5) !important;
+      font-weight: 600 !important;
+      padding: 0.75rem 1rem !important;
+    }
+    .markdown-section table td {
+      border-color: rgba(58, 58, 58, 0.3) !important;
+      padding: 0.75rem 1rem !important;
+    }
+    .markdown-section table tr:nth-child(even) {
+      background: rgba(42, 42, 42, 0.4) !important;
+    }
+    .markdown-section table {
+      border-radius: 6px !important;
+      overflow: hidden !important;
+      max-width: 100% !important;
+      display: block !important;
+      overflow-x: auto !important;
+    }
+    .markdown-section a {
+      color: #6ab0ff !important;
+    }
+    .markdown-section a:hover {
+      color: #4a9eff !important;
+    }
+    .markdown-section blockquote {
+      border-left-color: #4a9eff !important;
+      background: #2a2a2a !important;
+      color: #b0b0b0 !important;
+    }
+    .app-name {
+      display: none !important;
+    }
+    .sidebar-toggle {
+      background: transparent !important;
+      border: none !important;
+      box-shadow: none !important;
+      padding: 0.5rem !important;
+    }
+    .sidebar-toggle-button {
+      background: transparent !important;
+      border: none !important;
+      box-shadow: none !important;
+    }
+    .sidebar-toggle span {
+      background: #5ba5ff !important;
+    }
+    .search input {
+      background: #2a2a2a !important;
+      border: 1px solid rgba(74, 158, 255, 0.3) !important;
+      border-radius: 6px !important;
+      color: #e0e0e0 !important;
+      padding: 0.75rem 1rem !important;
+      font-size: 0.95em !important;
+      transition: all 0.3s !important;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2) !important;
+    }
+    .search input:focus {
+      outline: none !important;
+      border-color: #5ba5ff !important;
+      box-shadow: 0 0 0 3px rgba(91, 165, 255, 0.1), 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+      background: #2f2f2f !important;
+    }
+    .search input::placeholder {
+      color: #6c757d !important;
+    }
+    .search .results-panel {
+      background: #2a2a2a !important;
+      border: 1px solid rgba(74, 158, 255, 0.2) !important;
+      border-radius: 6px !important;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+      margin-top: 0.5rem !important;
+    }
+    .search .matching-post {
+      color: #b0b0b0 !important;
+      padding: 0.75rem 1rem !important;
+      transition: all 0.2s !important;
+    }
+    .search .matching-post:hover {
+      background: rgba(74, 158, 255, 0.1) !important;
+      color: #5ba5ff !important;
+    }
+  </style>
+</head>
+<body>
+  <div id="app"></div>
+  <script>
+    window.$docsify = {
+      name: '',
+      repo: '',
+      loadSidebar: true,
+      subMaxLevel: 3,
+      auto2top: true,
+      coverpage: false,
+      search: {
+        maxAge: 86400000,
+        paths: 'auto',
+        placeholder: 'Search...',
+        noData: 'No Results!',
+        depth: 6
+      }
+    }
+  </script>
+  <script src="//cdn.jsdelivr.net/npm/docsify@4"></script>
+  <script src="//cdn.jsdelivr.net/npm/docsify/lib/plugins/search.min.js"></script>
+  <script>
+    // Collapsible sidebar functionality
+    (function() {
+      // Use link hrefs as keys for persistence across re-renders
+      const expandedLinks = new Set();
+      
+      function setupCollapsible() {
+        const sidebar = document.querySelector('.sidebar');
+        if (!sidebar) return;
+        
+        const items = sidebar.querySelectorAll('ul li');
+        items.forEach(function(item) {
+          const sublist = item.querySelector('ul');
+          if (sublist) {
+            item.classList.add('has-children');
+            
+            const link = item.querySelector('a');
+            if (link) {
+              const linkHref = link.getAttribute('href');
+              // Only expand if user manually expanded it OR if this item or its children are active
+              const hasActiveChild = item.querySelector('li.active') !== null;
+              const shouldExpand = (linkHref && expandedLinks.has(linkHref)) || item.classList.contains('active') || hasActiveChild;
+              
+              if (shouldExpand) {
+                item.classList.remove('collapsed');
+              } else {
+                item.classList.add('collapsed');
+              }
+              
+              // Remove old listeners and add new one
+              const newLink = link.cloneNode(true);
+              link.parentNode.replaceChild(newLink, link);
+              
+              newLink.addEventListener('click', function(e) {
+                if (item.classList.contains('has-children')) {
+                  const href = newLink.getAttribute('href');
+                  
+                  if (item.classList.contains('collapsed')) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    item.classList.remove('collapsed');
+                    if (href) expandedLinks.add(href);
+                  } else {
+                    if (!item.classList.contains('active')) {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      item.classList.add('collapsed');
+                      if (href) expandedLinks.delete(href);
+                    }
+                  }
+                }
+              });
+            }
+          }
+        });
+      }
+      
+      // Initialize
+      function init() {
+        setupCollapsible();
+        
+        // Watch for sidebar changes and preserve state
+        const observer = new MutationObserver(function() {
+          const sidebar = document.querySelector('.sidebar');
+          if (sidebar) {
+            const items = sidebar.querySelectorAll('ul li.has-children');
+            items.forEach(function(item) {
+              const link = item.querySelector('a');
+              if (link) {
+                const href = link.getAttribute('href');
+                const hasActiveChild = item.querySelector('li.active') !== null;
+                const shouldExpand = (href && expandedLinks.has(href)) || item.classList.contains('active') || hasActiveChild;
+                
+                if (shouldExpand) {
+                  item.classList.remove('collapsed');
+                } else {
+                  item.classList.add('collapsed');
+                }
+              }
+            });
+          }
+        });
+        
+        const sidebar = document.querySelector('.sidebar');
+        if (sidebar) {
+          observer.observe(sidebar, { childList: true, subtree: true });
+        }
+      }
+      
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+      } else {
+        init();
+      }
+      
+      // Re-setup only on actual navigation
+      if (window.$docsify) {
+        window.$docsify.plugins = [].concat(window.$docsify.plugins || [], function(hook) {
+          hook.doneEach(function() {
+            setTimeout(setupCollapsible, 50);
+          });
+        });
+      }
+    })();
+  </script>
+</body>
+</html>
+

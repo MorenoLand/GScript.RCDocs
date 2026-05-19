@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>RC Protocol Documentation</title>
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@2/dist/purify.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+    <style>
+        :root {
+            --bg: #1a1a1a;
+            --surface: #222222;
+            --surface2: #2a2a2a;
+            --border: #333333;
+            --accent: #4a9eff;
+            --accent2: #6ab0ff;
+            --accent3: #8bc0ff;
+            --text: #d8d8d8;
+            --text-dim: #888888;
+            --code-bg: #1e1e2e;
+            --toc-width: 220px;
+            --content-max: 860px;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.7;
+            color: var(--text);
+            background: var(--bg);
+            font-size: 15px;
+        }
+
+        /* ── Header ── */
+        header {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 1.5rem 2rem 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 1.25rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(8px);
+            box-shadow: 0 1px 12px rgba(0,0,0,0.4);
+        }
+        .header-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, var(--accent) 0%, #2d6ebe 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+            box-shadow: 0 2px 8px rgba(74,158,255,0.3);
+        }
+        .header-text h1 {
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: #fff;
+            letter-spacing: 0.01em;
+        }
+        .header-text p {
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            margin-top: 0.1rem;
+        }
+        nav {
+            margin-left: auto;
+            display: flex;
+            gap: 0.35rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        nav a {
+            color: var(--text-dim);
+            text-decoration: none;
+            padding: 0.45rem 0.9rem;
+            border-radius: 6px;
+            transition: color 0.15s, background 0.15s;
+            font-size: 0.875rem;
+            font-weight: 500;
+            white-space: nowrap;
+            border: 1px solid transparent;
+        }
+        nav a:hover {
+            color: var(--text);
+            background: var(--surface2);
+            border-color: var(--border);
+        }
+        nav a.active {
+            color: var(--accent);
+            background: rgba(74,158,255,0.1);
+            border-color: rgba(74,158,255,0.3);
+        }
+
+        /* ── Layout ── */
+        .layout {
+            display: flex;
+            align-items: flex-start;
+            max-width: calc(var(--content-max) + var(--toc-width) + 6rem);
+            margin: 0 auto;
+            padding: 0 2rem;
+            gap: 2.5rem;
+        }
+
+        /* ── Table of Contents ── */
+        .toc {
+            width: var(--toc-width);
+            flex-shrink: 0;
+            position: sticky;
+            top: 76px;
+            max-height: calc(100vh - 100px);
+            overflow-y: auto;
+            padding: 1.25rem 0;
+            scrollbar-width: thin;
+            scrollbar-color: var(--border) transparent;
+        }
+        .toc::-webkit-scrollbar { width: 4px; }
+        .toc::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+        .toc-title {
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--text-dim);
+            margin-bottom: 0.75rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+        .toc ul { list-style: none; }
+        .toc ul li { margin: 0; }
+        .toc ul li a {
+            display: block;
+            padding: 0.3rem 0.5rem;
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            text-decoration: none;
+            border-radius: 4px;
+            border-left: 2px solid transparent;
+            transition: color 0.15s, background 0.15s, border-color 0.15s;
+            line-height: 1.4;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .toc ul li a:hover {
+            color: var(--text);
+            background: var(--surface2);
+        }
+        .toc ul li a.active {
+            color: var(--accent2);
+            border-left-color: var(--accent2);
+            background: rgba(74,158,255,0.07);
+        }
+        .toc ul li.h3 a { padding-left: 1.25rem; font-size: 0.76rem; }
+        .toc ul li.h4 a { padding-left: 2rem; font-size: 0.72rem; }
+
+        /* ── Content ── */
+        .content {
+            flex: 1;
+            min-width: 0;
+            max-width: var(--content-max);
+            padding: 2rem 0 4rem;
+        }
+
+        /* Typography */
+        .content hr {
+            border: none;
+            height: 1px;
+            margin: 2.5rem 0;
+            background: linear-gradient(to right, transparent, var(--border) 20%, rgba(74,158,255,0.35) 50%, var(--border) 80%, transparent);
+        }
+        .content h1 {
+            font-size: 1.7rem;
+            font-weight: 700;
+            color: #fff;
+            margin: 2.5rem 0 1.25rem;
+            padding-bottom: 0.65rem;
+            border-bottom: 1px solid var(--border);
+            padding-top: 0.5rem;
+        }
+        .content h1:first-child { margin-top: 0; padding-top: 0; }
+        .content h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--accent2);
+            margin: 2.25rem 0 1rem;
+            padding-bottom: 0.4rem;
+            border-bottom: 1px solid rgba(74,158,255,0.18);
+        }
+        .content h3 {
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: var(--accent3);
+            margin: 1.75rem 0 0.75rem;
+        }
+        .content h4 {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #aacfff;
+            margin: 1.25rem 0 0.5rem;
+        }
+        .content p { margin-bottom: 1.1rem; }
+        .content ul, .content ol {
+            margin: 0.75rem 0 1.25rem;
+            padding-left: 1.5rem;
+        }
+        .content li { margin: 0.35rem 0; color: var(--text); }
+        .content strong { color: #fff; font-weight: 600; }
+        .content em { color: #c0d8ff; }
+
+        /* Inline code */
+        .content code {
+            background: rgba(74,158,255,0.08);
+            color: #e090b0;
+            padding: 0.15em 0.4em;
+            border-radius: 4px;
+            font-family: "JetBrains Mono", "Fira Code", "Courier New", monospace;
+            font-size: 0.875em;
+            border: 1px solid rgba(74,158,255,0.15);
+        }
+
+        /* Code blocks */
+        .content pre {
+            background: var(--code-bg);
+            padding: 1.1rem 1.25rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 1rem 0 1.5rem;
+            border: 1px solid rgba(74,158,255,0.12);
+            border-left: 3px solid rgba(74,158,255,0.5);
+            box-shadow: 0 2px 12px rgba(0,0,0,0.25);
+            position: relative;
+        }
+        .content pre code {
+            background: transparent !important;
+            padding: 0;
+            color: #cdd6f4;
+            border: none !important;
+            font-size: 0.875rem;
+            border-radius: 0;
+            font-family: "JetBrains Mono", "Fira Code", "Courier New", monospace;
+            line-height: 1.6;
+        }
+
+        /* Tables */
+        .content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0 1.75rem;
+            font-size: 0.875rem;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            display: block;
+            overflow-x: auto;
+        }
+        .content table th {
+            background: rgba(74,158,255,0.1);
+            color: var(--accent2);
+            font-weight: 600;
+            padding: 0.65rem 0.9rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(74,158,255,0.2);
+            white-space: nowrap;
+        }
+        .content table td {
+            padding: 0.6rem 0.9rem;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+            vertical-align: top;
+        }
+        .content table tr:last-child td { border-bottom: none; }
+        .content table tr:nth-child(even) td { background: rgba(255,255,255,0.025); }
+        .content table tr:hover td { background: rgba(74,158,255,0.05); }
+
+        /* Blockquote */
+        .content blockquote {
+            border-left: 3px solid var(--accent);
+            margin: 1.25rem 0;
+            padding: 0.85rem 1.1rem;
+            background: rgba(74,158,255,0.06);
+            border-radius: 0 6px 6px 0;
+            color: #b8c8d8;
+        }
+        .content blockquote p { margin: 0; }
+
+        /* Links */
+        .content a { color: var(--accent2); text-decoration: none; }
+        .content a:hover { color: var(--accent); text-decoration: underline; }
+
+        /* Loading / Error */
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            padding: 5rem 2rem;
+            color: var(--text-dim);
+            font-size: 0.9rem;
+        }
+        .loading::before {
+            content: '';
+            width: 18px;
+            height: 18px;
+            border: 2px solid var(--border);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .error {
+            background: rgba(200,50,60,0.15);
+            color: #f08080;
+            padding: 1rem 1.25rem;
+            border-radius: 8px;
+            border: 1px solid rgba(200,50,60,0.3);
+            font-size: 0.9rem;
+        }
+
+        /* Scroll-to-top */
+        #scroll-top {
+            position: fixed;
+            bottom: 1.75rem;
+            right: 1.75rem;
+            width: 38px;
+            height: 38px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-dim);
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.2s, color 0.2s, border-color 0.2s;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 200;
+        }
+        #scroll-top.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        #scroll-top:hover {
+            color: var(--accent);
+            border-color: rgba(74,158,255,0.4);
+        }
+
+        /* Responsive */
+        @media (max-width: 960px) {
+            .toc { display: none; }
+            .layout { max-width: 100%; padding: 0 1.25rem; }
+            header { padding: 1rem 1.25rem; }
+            nav { display: none; }
+        }
+        @media (max-width: 600px) {
+            .content { padding: 1.25rem 0 3rem; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-icon">📡</div>
+        <div class="header-text">
+            <h1>RC Protocol Documentation</h1>
+            <p>Remote Control · NPC Control · Listserver</p>
+        </div>
+        <nav id="nav">
+            <a href="#" data-page="README.md">Home</a>
+            <a href="#" data-page="listserver.md">Listserver</a>
+            <a href="#" data-page="nc.md">NC Protocol</a>
+            <a href="#" data-page="rc.md">RC Protocol</a>
+        </nav>
+    </header>
+
+    <div class="layout">
+        <aside class="toc" id="toc">
+            <div class="toc-title">On this page</div>
+            <ul id="toc-list"></ul>
+        </aside>
+        <main class="content" id="content">
+            <div class="loading">Loading…</div>
+        </main>
+    </div>
+
+    <button id="scroll-top" title="Back to top" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+    <script>
+        let currentPage = 'README.md';
+
+        // Nav
+        document.getElementById('nav').addEventListener('click', function(e) {
+            const a = e.target.closest('a[data-page]');
+            if (!a) return;
+            e.preventDefault();
+            loadPage(a.dataset.page);
+        });
+
+        async function loadPage(filename) {
+            currentPage = filename;
+            const content = document.getElementById('content');
+            content.innerHTML = '<div class="loading">Loading…</div>';
+            document.getElementById('toc-list').innerHTML = '';
+
+            // Update active nav
+            document.querySelectorAll('nav a').forEach(a => {
+                a.classList.toggle('active', a.dataset.page === filename);
+            });
+
+            try {
+                const response = await fetch(filename);
+                if (!response.ok) throw new Error('HTTP ' + response.status);
+                const text = await response.text();
+                const html = DOMPurify.sanitize(marked.parse(text));
+                content.innerHTML = html;
+
+                // Anchor IDs for headings
+                content.querySelectorAll('h1,h2,h3,h4').forEach((el, i) => {
+                    if (!el.id) {
+                        el.id = 'h-' + i + '-' + el.textContent.trim()
+                            .toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+                    }
+                });
+
+                buildTOC();
+
+                if (window.Prism) Prism.highlightAllUnder(content);
+            } catch (err) {
+                content.innerHTML = '<div class="error">Failed to load ' + filename + ': ' + err.message + '<br><br>This viewer must be served from a web server.</div>';
+            }
+        }
+
+        function buildTOC() {
+            const list = document.getElementById('toc-list');
+            list.innerHTML = '';
+            const headings = document.getElementById('content').querySelectorAll('h2,h3,h4');
+            if (headings.length < 3) {
+                document.getElementById('toc').style.visibility = 'hidden';
+                return;
+            }
+            document.getElementById('toc').style.visibility = '';
+            headings.forEach(h => {
+                const li = document.createElement('li');
+                li.className = h.tagName.toLowerCase();
+                const a = document.createElement('a');
+                a.href = '#' + h.id;
+                a.textContent = h.textContent;
+                a.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    document.getElementById(h.id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                });
+                li.appendChild(a);
+                list.appendChild(li);
+            });
+        }
+
+        // Scroll spy for TOC
+        let scrollTimer;
+        window.addEventListener('scroll', function() {
+            // Scroll-to-top visibility
+            document.getElementById('scroll-top').classList.toggle('visible', window.scrollY > 400);
+
+            // Debounce TOC active
+            clearTimeout(scrollTimer);
+            scrollTimer = setTimeout(updateTOCActive, 60);
+        }, { passive: true });
+
+        function updateTOCActive() {
+            const headings = Array.from(document.getElementById('content').querySelectorAll('h2,h3,h4'));
+            const scrollY = window.scrollY + 100;
+            let active = null;
+            for (const h of headings) {
+                if (h.offsetTop <= scrollY) active = h.id;
+                else break;
+            }
+            document.querySelectorAll('#toc-list a').forEach(a => {
+                a.classList.toggle('active', a.getAttribute('href') === '#' + active);
+            });
+        }
+
+        // Initial load
+        loadPage('README.md');
+    </script>
+</body>
+</html>
