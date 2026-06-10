@@ -1889,7 +1889,8 @@ Used for NPC IDs and some other 24-bit values.
 |----|------|-----------|---------|----------------|
 | 0 | PLO_LEVELBOARD | S→C | Level board data | Board data |
 | 1 | PLO_LEVELLINK | S→C | Level link data | Link data |
-| 5 | PLO_BOARDPACKET | S→C | Board message | Message |
+| 5 | PLO_LEVELSIGN | S->C | Level sign data | Sign data |
+| 7 | PLO_BOARDMODIFY | S->C | Board modification | Board modification data |
 | 6 | PLO_LEVELNAME | S→C | Current level name | Level name (raw) |
 | 8 | PLO_OTHERPLPROPS | S→C | Other player properties | Player ID (GShort) + properties |
 | 9 | PLO_PLAYERPROPS | S→C | Own player properties | Properties |
@@ -1934,6 +1935,7 @@ Used for NPC IDs and some other 24-bit values.
 | 82 | PLO_SERVERTEXT | S→C | Server text message | Text data (CommaText) |
 | 84 | PLO_LARGEFILESIZE | S→C | Large file size | File size (GInt5) |
 | 100 | PLO_RAWDATA | S→C | Raw data wrapper | Length (GInt24) + 0x0A + inner packet |
+| 101 | PLO_BOARDPACKET | S->C | Board packet | Board packet data |
 | 102 | PLO_FILE | S→C | File data chunk | Timestamp (GInt5) + filename (GString) + content |
 | 103 | PLO_RC_MAXUPLOADFILESIZE | S→C | Max upload size | Max size (GInt5) — server sends `>> (long long)(1048576 * 20)` = 20 MiB default |
 | 180 | PLO_STATUSLIST | S→C | Status list | Status data |
