@@ -1208,7 +1208,7 @@ Server responds with packet 77 (PLO_RC_FOLDERCONFIGGET) containing the folder co
 **Setting Folder Configuration:**
 Send packet 54 (PLI_RC_FOLDERCONFIGSET) with configuration in CommaText format.
 
-## PLO_ADDPLAYER and PLO_DELPLAYER
+## Player Presence Updates
 
 ### PLO_ADDPLAYER (55) — Player Joined
 

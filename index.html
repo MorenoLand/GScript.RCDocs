@@ -394,7 +394,7 @@
     /* Readability refresh */
     :root {
       --theme-color: #7cbcff;
-      --sidebar-width: 280px;
+      --sidebar-width: 320px;
       --page-bg: #111417;
       --panel-bg: #181c20;
       --panel-bg-soft: #1d2228;
@@ -703,7 +703,7 @@
 
     @media (max-width: 768px) {
       :root {
-        --sidebar-width: 280px;
+        --sidebar-width: 320px;
       }
 
       .content {
@@ -717,6 +717,439 @@
       .markdown-section h1 {
         font-size: 1.75rem !important;
       }
+    }
+
+    /* Second pass: make Docsify anchors and desktop chrome stop fighting the theme. */
+    :root {
+      --page-bg: #191b1d;
+      --panel-bg: #202326;
+      --panel-bg-soft: #272c30;
+      --text-main: #f0eee8;
+      --text-muted: #c9c7bf;
+      --text-soft: #9fa7ad;
+      --line: #3a4147;
+      --line-soft: #30363c;
+      --accent: #9bcfff;
+      --accent-2: #83d9c2;
+      --accent-warm: #e6c56f;
+      --code-bg: #121518;
+    }
+
+    .sidebar {
+      background: var(--panel-bg) !important;
+      box-shadow: none !important;
+    }
+
+    .sidebar ul li a {
+      color: var(--text-muted) !important;
+    }
+
+    .sidebar ul li.active > a,
+    .sidebar-nav > ul > li.active > a {
+      background: #293847 !important;
+      border-color: rgba(155, 207, 255, 0.34) !important;
+      color: #ffffff !important;
+    }
+
+    .content,
+    #main,
+    .markdown-body,
+    .markdown-section {
+      background: var(--page-bg) !important;
+    }
+
+    .markdown-section {
+      max-width: 960px !important;
+      padding-top: 4.25rem !important;
+    }
+
+    .markdown-section h1,
+    .markdown-section h2,
+    .markdown-section h3,
+    .markdown-section h4,
+    .markdown-section h1 a,
+    .markdown-section h2 a,
+    .markdown-section h3 a,
+    .markdown-section h4 a {
+      color: var(--text-main) !important;
+      text-decoration: none !important;
+      border-bottom: 0 !important;
+    }
+
+    .markdown-section h1 {
+      border-bottom: 1px solid var(--line) !important;
+    }
+
+    .markdown-section h2 {
+      border-bottom: 1px solid var(--line-soft) !important;
+    }
+
+    .markdown-section h3 {
+      color: #edf7f3 !important;
+    }
+
+    .markdown-section h4 {
+      color: var(--accent-warm) !important;
+    }
+
+    .markdown-section strong {
+      color: #fff4c7 !important;
+      font-weight: 700 !important;
+    }
+
+    .markdown-section p,
+    .markdown-section li {
+      color: var(--text-main) !important;
+    }
+
+    .markdown-section a {
+      color: var(--accent) !important;
+    }
+
+    .markdown-section h1 a,
+    .markdown-section h2 a,
+    .markdown-section h3 a,
+    .markdown-section h4 a {
+      color: inherit !important;
+    }
+
+    @media (min-width: 769px) {
+      .sidebar-toggle {
+        display: none !important;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .sidebar-toggle {
+        width: 44px !important;
+        height: 38px !important;
+        padding: 0 !important;
+      }
+    }
+
+    /* Hard overrides for Docsify's default link/anchor/sidebar behavior. */
+    body .markdown-section a,
+    body .markdown-section a:hover,
+    body .markdown-section a:visited,
+    body .markdown-section a:active,
+    body .markdown-section a span,
+    body .markdown-section .anchor,
+    body .markdown-section .anchor span {
+      color: var(--accent) !important;
+      text-decoration: none !important;
+      border-bottom: 0 !important;
+      box-shadow: none !important;
+    }
+
+    body .markdown-section h1,
+    body .markdown-section h2,
+    body .markdown-section h3,
+    body .markdown-section h4,
+    body .markdown-section h1 a,
+    body .markdown-section h2 a,
+    body .markdown-section h3 a,
+    body .markdown-section h4 a,
+    body .markdown-section h1 a span,
+    body .markdown-section h2 a span,
+    body .markdown-section h3 a span,
+    body .markdown-section h4 a span {
+      color: #f3f0e8 !important;
+      text-decoration: none !important;
+      border-bottom: 0 !important;
+      box-shadow: none !important;
+    }
+
+    body .markdown-section h1 {
+      margin-top: 0 !important;
+      padding-top: 0 !important;
+      border-bottom: 1px solid var(--line) !important;
+    }
+
+    body .markdown-section h1:first-child {
+      margin-top: 0 !important;
+      padding-top: 0 !important;
+    }
+
+    body .markdown-section h2 {
+      border-bottom: 1px solid var(--line-soft) !important;
+    }
+
+    body .markdown-section h1 .anchor,
+    body .markdown-section h2 .anchor,
+    body .markdown-section h3 .anchor,
+    body .markdown-section h4 .anchor {
+      color: inherit !important;
+      opacity: 1 !important;
+    }
+
+    body .markdown-section h1 .anchor span,
+    body .markdown-section h2 .anchor span,
+    body .markdown-section h3 .anchor span,
+    body .markdown-section h4 .anchor span {
+      color: inherit !important;
+    }
+
+    body .markdown-section h1 a:hover,
+    body .markdown-section h2 a:hover,
+    body .markdown-section h3 a:hover,
+    body .markdown-section h4 a:hover {
+      color: #ffffff !important;
+    }
+
+    body .sidebar {
+      bottom: 0 !important;
+      overflow-y: auto !important;
+      overflow-x: hidden !important;
+    }
+
+    body .sidebar-nav {
+      padding: 0 !important;
+      margin: 0 !important;
+    }
+
+    body .sidebar ul li ul {
+      margin: 0.25rem 0 0.7rem 0.8rem !important;
+      padding-left: 0.45rem !important;
+      border-left: 1px solid var(--line-soft) !important;
+    }
+
+    body .sidebar ul li ul li a {
+      padding: 0.42rem 0.65rem !important;
+      color: #b9c0c6 !important;
+      font-size: 0.92rem !important;
+    }
+
+    body .sidebar ul li a {
+      text-decoration: none !important;
+      white-space: nowrap !important;
+      overflow: hidden !important;
+      text-overflow: ellipsis !important;
+    }
+
+    body .sidebar ul li.active > a,
+    body .sidebar ul li.open > a {
+      color: #ffffff !important;
+      background: #2d3740 !important;
+      border: 1px solid #45525e !important;
+      border-left: 3px solid var(--accent) !important;
+    }
+
+    @media (min-width: 769px) {
+      body .sidebar-toggle,
+      body .sidebar-toggle-button {
+        display: none !important;
+        visibility: hidden !important;
+        pointer-events: none !important;
+      }
+    }
+
+    body .sidebar-nav > ul > li > a {
+      display: flex !important;
+      align-items: center !important;
+      gap: 0.65rem !important;
+      min-height: 38px !important;
+      padding-right: 2.55rem !important;
+      width: 100% !important;
+      box-sizing: border-box !important;
+    }
+
+    body .sidebar-nav > ul > li > a::before {
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      width: 22px !important;
+      height: 22px !important;
+      flex: 0 0 22px !important;
+      border-radius: 6px !important;
+      background: #303941 !important;
+      color: #f1efe8 !important;
+      font-size: 0.72rem !important;
+      font-weight: 800 !important;
+      line-height: 1 !important;
+    }
+
+    body .sidebar-nav > ul > li li.has-children > a {
+      display: flex !important;
+      align-items: center !important;
+      gap: 0.55rem !important;
+      min-height: 34px !important;
+      font-weight: 600 !important;
+      color: #d9ddd9 !important;
+      padding-right: 2.55rem !important;
+      width: 100% !important;
+      box-sizing: border-box !important;
+    }
+
+    body .sidebar-nav > ul > li li.has-children > a::before {
+      content: "" !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      width: 20px !important;
+      height: 20px !important;
+      flex: 0 0 20px !important;
+      border-radius: 6px !important;
+      background-color: #333b43 !important;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23d9e6ed' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 7.5h6l2 2h10v8.5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z'/%3E%3Cpath d='M3 7.5V6a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v1.5'/%3E%3C/svg%3E") !important;
+      background-position: center !important;
+      background-repeat: no-repeat !important;
+      background-size: 14px 14px !important;
+      color: transparent !important;
+      line-height: 1 !important;
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04) !important;
+      position: relative !important;
+    }
+
+    body .sidebar-nav > ul > li li.has-children > a::after {
+      content: "" !important;
+      display: none !important;
+      pointer-events: none !important;
+    }
+
+    body .sidebar-nav > ul > li li.has-children:nth-child(4n + 1) > a::before {
+      background-color: #343f39 !important;
+    }
+
+    body .sidebar-nav > ul > li li.has-children:nth-child(4n + 2) > a::before {
+      background-color: #3d382d !important;
+    }
+
+    body .sidebar-nav > ul > li li.has-children:nth-child(4n + 3) > a::before {
+      background-color: #353746 !important;
+    }
+
+    body .sidebar-nav > ul > li li.has-children.active > a::before,
+    body .sidebar-nav > ul > li li.has-children.open > a::before {
+      background-color: #31516a !important;
+    }
+
+    body .sidebar-nav > ul > li:nth-child(1) > a::before {
+      content: "⌂" !important;
+      background: #354238 !important;
+      color: #aee6bd !important;
+      font-size: 0.95rem !important;
+    }
+
+    body .sidebar-nav > ul > li:nth-child(2) > a::before {
+      content: "LS" !important;
+      background: #433b2e !important;
+      color: #f3ce82 !important;
+    }
+
+    body .sidebar-nav > ul > li:nth-child(3) > a::before {
+      content: "NC" !important;
+      background: #2d4241 !important;
+      color: #86e4cf !important;
+    }
+
+    body .sidebar-nav > ul > li:nth-child(4) > a::before {
+      content: "RC" !important;
+      background: #2f3d4f !important;
+      color: #9bcfff !important;
+    }
+
+    body .sidebar li.has-children {
+      position: relative !important;
+    }
+
+    body .sidebar li.has-children > a {
+      padding-right: 2.55rem !important;
+      width: 100% !important;
+      box-sizing: border-box !important;
+    }
+
+    body .sidebar .nav-branch-toggle {
+      position: absolute !important;
+      top: 0.38rem !important;
+      right: 0.45rem !important;
+      width: 26px !important;
+      height: 24px !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      background: transparent !important;
+      border: 0 !important;
+      border-radius: 6px !important;
+      color: #aeb7be !important;
+      cursor: pointer !important;
+      font-family: "Cascadia Code", Consolas, monospace !important;
+      font-size: 1rem !important;
+      line-height: 1 !important;
+      padding: 0 !important;
+      transition: background-color 0.15s ease, color 0.15s ease, transform 0.15s ease !important;
+      z-index: 20 !important;
+    }
+
+    body .sidebar .nav-branch-toggle:hover {
+      background: #343c44 !important;
+      color: #ffffff !important;
+    }
+
+    body .sidebar li.collapsed > .nav-branch-toggle {
+      transform: none !important;
+    }
+
+    body .sidebar li.collapsed > ul {
+      display: none !important;
+    }
+
+    body .sidebar li.section-parent.collapsed + ul.app-sub-sidebar {
+      display: none !important;
+    }
+
+    body .sidebar li.section-parent > a {
+      display: flex !important;
+      align-items: center !important;
+      gap: 0.55rem !important;
+      min-height: 34px !important;
+      font-weight: 600 !important;
+      color: #d9ddd9 !important;
+      padding-right: 2.55rem !important;
+      width: 100% !important;
+      box-sizing: border-box !important;
+    }
+
+    body .sidebar li.section-parent > a::before {
+      content: "" !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      width: 20px !important;
+      height: 20px !important;
+      flex: 0 0 20px !important;
+      border-radius: 6px !important;
+      background-color: #333b43 !important;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23d9e6ed' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 7.5h6l2 2h10v8.5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z'/%3E%3Cpath d='M3 7.5V6a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v1.5'/%3E%3C/svg%3E") !important;
+      background-position: center !important;
+      background-repeat: no-repeat !important;
+      background-size: 14px 14px !important;
+      color: transparent !important;
+      line-height: 1 !important;
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04) !important;
+      position: relative !important;
+    }
+
+    body .sidebar li.section-parent > a::after {
+      content: "" !important;
+      display: none !important;
+      pointer-events: none !important;
+    }
+
+    body .sidebar li.section-parent:nth-of-type(4n + 1) > a::before {
+      background-color: #343f39 !important;
+    }
+
+    body .sidebar li.section-parent:nth-of-type(4n + 2) > a::before {
+      background-color: #3d382d !important;
+    }
+
+    body .sidebar li.section-parent:nth-of-type(4n + 3) > a::before {
+      background-color: #353746 !important;
+    }
+
+    body .sidebar li.section-parent.active > a::before,
+    body .sidebar li.section-parent.open > a::before {
+      background-color: #31516a !important;
     }
   </style>
 </head>
@@ -745,90 +1178,114 @@
   <script>
     // Collapsible sidebar functionality
     (function() {
-      // Use link hrefs as keys for persistence across re-renders
       const expandedLinks = new Set();
+      let isSettingUpSidebar = false;
+      let setupTimer = 0;
+
+      function directChild(item, tagName) {
+        tagName = tagName.toUpperCase();
+        return Array.prototype.find.call(item.children, function(child) {
+          return child.tagName === tagName;
+        });
+      }
+
+      function itemDepth(item) {
+        let depth = 0;
+        let parent = item.parentElement;
+        while (parent) {
+          const parentItem = parent.parentElement && parent.parentElement.closest('li');
+          if (!parentItem) break;
+          depth += 1;
+          parent = parentItem.parentElement;
+        }
+        return depth;
+      }
+
+      function itemKey(item, link) {
+        return link && link.getAttribute('href') || link && link.textContent.trim() || item.textContent.trim();
+      }
       
       function setupCollapsible() {
+        if (isSettingUpSidebar) return;
+        isSettingUpSidebar = true;
+
         const sidebar = document.querySelector('.sidebar');
-        if (!sidebar) return;
+        if (!sidebar) {
+          isSettingUpSidebar = false;
+          return;
+        }
         
         const items = sidebar.querySelectorAll('ul li');
         items.forEach(function(item) {
-          const sublist = item.querySelector('ul');
+          let sublist = directChild(item, 'ul');
+          let adjacentSublist = false;
+          const next = item.nextElementSibling;
+          if (!sublist && next && next.tagName === 'UL') {
+            sublist = next;
+            adjacentSublist = true;
+            item.classList.add('section-parent');
+          } else {
+            item.classList.remove('section-parent');
+          }
+
           if (sublist) {
             item.classList.add('has-children');
             
-            const link = item.querySelector('a');
+            const link = directChild(item, 'a');
             if (link) {
-              const linkHref = link.getAttribute('href');
-              // Only expand if user manually expanded it OR if this item or its children are active
-              const hasActiveChild = item.querySelector('li.active') !== null;
-              const shouldExpand = (linkHref && expandedLinks.has(linkHref)) || item.classList.contains('active') || hasActiveChild;
+              const key = itemKey(item, link);
+              const hasActiveChild = sublist.querySelector('li.active') !== null;
+              const depth = itemDepth(item);
+              const shouldExpand = expandedLinks.has(key) || item.classList.contains('active') || hasActiveChild || (!adjacentSublist && depth === 0);
               
               if (shouldExpand) {
                 item.classList.remove('collapsed');
               } else {
                 item.classList.add('collapsed');
               }
-              
-              // Remove old listeners and add new one
-              const newLink = link.cloneNode(true);
-              link.parentNode.replaceChild(newLink, link);
-              
-              newLink.addEventListener('click', function(e) {
-                if (item.classList.contains('has-children')) {
-                  const href = newLink.getAttribute('href');
-                  
-                  if (item.classList.contains('collapsed')) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    item.classList.remove('collapsed');
-                    if (href) expandedLinks.add(href);
-                  } else {
-                    if (!item.classList.contains('active')) {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      item.classList.add('collapsed');
-                      if (href) expandedLinks.delete(href);
-                    }
-                  }
+
+              let toggle = directChild(item, 'button');
+              if (!toggle || !toggle.classList.contains('nav-branch-toggle')) {
+                toggle = document.createElement('button');
+                toggle.type = 'button';
+                toggle.className = 'nav-branch-toggle';
+                link.insertAdjacentElement('afterend', toggle);
+              }
+
+              toggle.setAttribute('aria-label', item.classList.contains('collapsed') ? 'Expand section' : 'Collapse section');
+              toggle.setAttribute('aria-expanded', item.classList.contains('collapsed') ? 'false' : 'true');
+              toggle.textContent = item.classList.contains('collapsed') ? '›' : '⌄';
+
+              toggle.onclick = function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+
+                const collapsed = item.classList.toggle('collapsed');
+                toggle.setAttribute('aria-label', collapsed ? 'Expand section' : 'Collapse section');
+                toggle.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+                toggle.textContent = collapsed ? '›' : '⌄';
+
+                if (collapsed) {
+                  expandedLinks.delete(key);
+                } else {
+                  expandedLinks.add(key);
                 }
-              });
+              };
             }
           }
         });
+
+        isSettingUpSidebar = false;
+      }
+
+      function scheduleSetup() {
+        window.clearTimeout(setupTimer);
+        setupTimer = window.setTimeout(setupCollapsible, 50);
       }
       
       // Initialize
       function init() {
-        setupCollapsible();
-        
-        // Watch for sidebar changes and preserve state
-        const observer = new MutationObserver(function() {
-          const sidebar = document.querySelector('.sidebar');
-          if (sidebar) {
-            const items = sidebar.querySelectorAll('ul li.has-children');
-            items.forEach(function(item) {
-              const link = item.querySelector('a');
-              if (link) {
-                const href = link.getAttribute('href');
-                const hasActiveChild = item.querySelector('li.active') !== null;
-                const shouldExpand = (href && expandedLinks.has(href)) || item.classList.contains('active') || hasActiveChild;
-                
-                if (shouldExpand) {
-                  item.classList.remove('collapsed');
-                } else {
-                  item.classList.add('collapsed');
-                }
-              }
-            });
-          }
-        });
-        
-        const sidebar = document.querySelector('.sidebar');
-        if (sidebar) {
-          observer.observe(sidebar, { childList: true, subtree: true });
-        }
+        scheduleSetup();
       }
       
       if (document.readyState === 'loading') {
@@ -841,7 +1298,7 @@
       if (window.$docsify) {
         window.$docsify.plugins = [].concat(window.$docsify.plugins || [], function(hook) {
           hook.doneEach(function() {
-            setTimeout(setupCollapsible, 50);
+            scheduleSetup();
           });
         });
       }
