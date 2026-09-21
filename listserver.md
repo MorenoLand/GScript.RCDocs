@@ -109,8 +109,8 @@ After sending the edition packet, you send your login information.
 
 **Format:**
 The login packet uses a special format called "DYNAMIC" format. This means:
-- If the packet is small (less than 40 bytes), it's sent as plain text (format type 0x02)
-- If the packet is larger (40 bytes or more), it's compressed with ZLIB (format type 0x04)
+- If the packet is 40 bytes or fewer, it's sent as plain text (format type 0x02)
+- If the packet is larger than 40 bytes, it's compressed with ZLIB (format type 0x04)
 - Then it's encrypted using the scrambler algorithm
 - The 2-byte length field includes the format byte itself
 
@@ -135,8 +135,8 @@ Raw payload: 21 2B 74 65 73 74 61 63 63 6F 75 6E 74 2A 6D 79 70 61 73 73 77 6F 7
 
 **Complete packet structure:**
 ```
-1. If payload >= 40 bytes: Compress with ZLIB (format type 0x04)
-   If payload < 40 bytes: Use as-is (format type 0x02)
+1. If payload > 40 bytes: Compress with ZLIB (format type 0x04)
+   If payload <= 40 bytes: Use as-is (format type 0x02)
 2. Encrypt using scrambler algorithm with seed 4
 3. Send: [2-byte length (includes format byte)] + [format type byte] + [encrypted/compressed data]
 ```
@@ -334,7 +334,7 @@ The listserver also helps with messaging between players on different servers. T
 - Packet type: 1 (PLI_SERVERLIST)
 - Format: Packet type (GByte) + account length (GByte) + account + password length (GByte) + password + 0x0A
 - Wire: [2-byte big-endian length (includes format byte)] + [format byte 0x02 or 0x04] + [scrambled data]
-- Uses DYNAMIC format (compressed with ZLIB if payload >= 40 bytes, then scrambled with seed 4)
+- Uses DYNAMIC format (compressed with ZLIB if payload > 40 bytes, then scrambled with seed 4)
 
 ### Listserver to Client
 

@@ -39,7 +39,7 @@ The login packet is sent as packet type 6 (PLI_TOALL) before encryption is enabl
 
 - `version_string`: `"GSERV025"` (note the leading `"v"` before it makes the full header `"vGSERV025"`)
 - Account and password use `get1PlusTextNetString` encoding (see Helper Functions)
-- `os_info`: `"win,<pcid>,<pcid>,\"\""` or `"mac,<pcid>,<pcid>,\"\""`
+- `os_info`: Windows uses `"win,<windows_id>,<network_id>,<harddisk_id>"`; Linux uses `"linux,<network_id>,<system_id>,"`; macOS uses `"mac,<network_id>,<system_id>,"`
 
 **After sending the login packet, the encryption key is immediately set to `0x56`.** All subsequent packets are encrypted with this key. The server does not send the key in any packet — `0x56` is the fixed well-known RC client key.
 
@@ -204,18 +204,20 @@ Complete: 39 61 62 63 31 32 33 0A
 Packets can be compressed and encrypted before being sent over the network.
 
 **Compression:**
-- If the packet is small (less than 40 bytes), it's sent as-is
-- If it's larger, it's compressed with ZLIB
+- Payloads larger than 4095 bytes use BZIP2 (format type `0x06`) when compression succeeds
+- Payloads larger than 47 bytes otherwise use ZLIB (format type `0x04`)
+- Smaller payloads remain uncompressed (format type `0x02`) unless ZLIB produces a smaller result
 
 **Encryption:**
-- Uses the same scrambler algorithm as the listserver
+- Uses the same mask recurrence as the listserver, but RC maintains separate rolling `iterator_out` and `iterator_in` state across packets; both reset when the protocol is reset, not for every packet
 - The encryption key is `0x56` (fixed, set immediately after sending the login packet)
 - Small packets (format byte 0x02): encrypt the first 48 bytes (12 groups of 4)
-- Large packets (format byte 0x04): encrypt the first 16 bytes (4 groups of 4)
+- Compressed packets (format bytes 0x04 and 0x06): encrypt the first 16 bytes (4 groups of 4)
 
 **Format byte:**
 - Small packet: 0x02 (means "plain text, maybe encrypted")
 - Large packet: 0x04 (means "ZLIB compressed, maybe encrypted")
+- Large BZIP2 packet: 0x06 (BZIP2 compressed, maybe encrypted)
 
 **Wire format:**
 ```
@@ -478,8 +480,8 @@ The server responds with:
 The server may send these packets bundled together and compressed with BZIP2. You MUST check for this before parsing packets!
 
 **How to detect:**
-- After receiving data and decrypting (if encrypted), check if buffer starts with 'BZ'
-- If yes, decompress the ENTIRE buffer with bz2.decompress()
+- After receiving data and decrypting (if encrypted), check for the compression markers used by the current grclib path: `Zh` (restore the leading `B` before BZIP2 decompression), standard `BZ`, or the `1F 8B` compressed-data path
+- If a marker is present, decompress the ENTIRE buffer before parsing individual packets
 - Only then parse individual packets from the decompressed data
 
 **Why this matters:**
@@ -667,7 +669,7 @@ Some servers (especially for level files) embed the first chunk directly in pack
 **How to detect and handle embedded protocol:**
 
 1. **Check for BZIP2 compression first:**
-   - If buffer starts with 'BZ', decompress entire buffer first
+   - If the buffer uses `Zh`, `BZ`, or `1F 8B`, decompress the entire buffer first
    - This is buffer-level compression, not packet-level!
 
 2. **Detect packet 68 (PLO_LARGEFILESTART) in packet 66:**
@@ -710,9 +712,13 @@ def request_file(filepath):
     send_packet(92, filepath.encode('latin-1'))
 
 def handle_packet_66(payload):
-    # Check for BZIP2 compression
-    if payload.startswith(b'BZ'):
+    # Check buffer-level compression before parsing packets
+    if payload.startswith(b'Zh'):
+        payload = bz2.decompress(b'B' + payload)
+    elif payload.startswith(b'BZ'):
         payload = bz2.decompress(payload)
+    elif payload.startswith(b'\x1f\x8b'):
+        payload = zlib.decompress(payload)
     
     # Check if this is embedded bigfile protocol
     if len(payload) > 0 and payload[0] == 100:  # Packet 68 (PLO_LARGEFILESTART)
@@ -831,7 +837,7 @@ def handle_packet_69(payload):
 **Common bugs:**
 1. Using basename instead of full path as key → chunks don't match → corruption
 2. Not stripping trailing 0x0A from packet 100 → each chunk 1 byte too large → corruption
-3. Not checking for BZIP2 compression → can't parse packets
+3. Not checking for the `Zh`/`BZ`/`1F 8B` compression variants → can't parse packets
 4. Not detecting embedded protocol → lose first 32KB of level files
 5. Reading GInt5 as 8 raw bytes → wrong file sizes/timestamps
 
@@ -1089,10 +1095,10 @@ Server responds with packet 63 (PLO_RC_PLAYERCOMMENTSGET) containing (from `msgP
 
 ```
 [Account name: GString]
-[Comments: raw bytes]     -- p->getComments() appended directly, no length prefix, no CommaText encoding
+[Comments: packet remainder]     -- no length prefix; current grclib passes the remainder through gtokenizeReverse
 ```
 
-The comments field is the **raw stored comments string** with no wrapping or encoding applied. The server writes `>> (char)acc.length() << acc << p->getComments()` — the comments start immediately after the account GString. The comments may internally use CommaText if they were stored that way, but no encoding is added by this packet handler.
+The comments field has no separate length prefix and starts immediately after the account GString. The current grclib reader treats the remainder as CommaText and applies `gtokenizeReverse`; a payload without CommaText syntax remains ordinary text.
 
 ### Disconnecting a Player
 
@@ -1734,13 +1740,13 @@ def handle_servertxt(payload):
 
 ### get1PlusTextNetString
 
-This function creates a length-prefixed string where the length byte can exceed 255 by using a special encoding.
+This function creates the length-prefixed string used by the current grclib login and nickname paths. It does not carry arbitrary strings beyond the supported 223-byte payload.
 
 **Format:**
 - If string length <= 223: Normal GString (length + 32, then string)
-- If string length > 223: Use 255 (0xFF) as length byte, then send remaining string (length - 223)
+- If string length > 223: Emit `0xFF` followed by only the first 223 bytes; the current grclib implementation does not append the remainder
 
-**Purpose:** Allows strings longer than 255 characters by using 255 as a special marker.
+**Purpose:** `0xFF` marks the overlength/truncated form used by the current implementation; callers should keep values at or below 223 bytes.
 
 ### gtokenize (CommaText Encoding)
 
@@ -1808,7 +1814,7 @@ Used for NPC IDs and some other 24-bit values.
 - **Solution:** You're probably reading it as 8 raw bytes instead of 5 GByte-encoded values. Use GInt5 encoding.
 
 **Problem: Packet 66 folder listing doesn't work**
-- **Solution:** Check if the data is BZIP2 compressed (starts with 'BZ'). Also, some servers send plain Graal encoding (not Format.DYNAMIC), so check the first byte - if it looks like a valid folder path length, it's probably plain encoding.
+- **Solution:** Check for the `Zh`/`BZ` BZIP2 variants and the current `1F 8B` compressed-data branch before parsing. Also, some servers send plain Graal encoding (not Format.DYNAMIC), so check the first byte - if it looks like a valid folder path length, it's probably plain encoding.
 
 **Problem: Sending rights or comments returns no response**
 - **Solution:** Use packet 84 (PLI_RC_PLAYERRIGHTSSET) for setting player rights and packet 86 (PLI_RC_PLAYERCOMMENTSSET) for setting comments. These are the canonical packet numbers confirmed in both IEnums.h and TPlayerRC.cpp. Do not route through packet 155 (PLI_RC_LARGEFILESTART) — that packet is for large file upload handling, not rights/comments.
@@ -1915,7 +1921,7 @@ Used for NPC IDs and some other 24-bit values.
 | 56 | PLO_DELPLAYER | S→C | Player left | Player ID (GShort) |
 | 61 | PLO_RC_SERVERFLAGSGET | S→C | Server flags response | Flag count (GShort) + flag strings (GString each, format "name=value") |
 | 62 | PLO_RC_PLAYERRIGHTSGET | S→C | Player rights response | Account (GString) + rights (GInt5) + IP range (GString) + folder access length (GShort, always present) + folder access (gtokenized folder rules) |
-| 63 | PLO_RC_PLAYERCOMMENTSGET | S→C | Player comments response | Account (GString) + comments (raw bytes, no length prefix, no CommaText encoding) |
+| 63 | PLO_RC_PLAYERCOMMENTSGET | S→C | Player comments response | Account (GString) + comments remainder (no length prefix; current grclib applies `gtokenizeReverse`) |
 | 64 | PLO_RC_PLAYERBANGET | S→C | Player ban info response | Account (GString) + banned flag (GByte: 1=banned) + ban reason (raw bytes, no length prefix) |
 | 65 | PLO_RC_FILEBROWSER_DIRLIST | S→C | Folder list | Folder rules (gtokenized/CommaText — each decoded line: "rights pattern"; no length prefix, fills remainder of packet) |
 | 66 | PLO_RC_FILEBROWSER_DIR | S→C | Folder contents or embedded file chunk | Folder path (GString) + for each file: space byte + [GByte entry_length + [filename GString + rights GString + size GInt5 + modtime GInt5]] — or embedded bigfile protocol |

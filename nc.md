@@ -172,8 +172,8 @@ A7
 ### Uploading a Weapon
 
 To upload a weapon script, you send packet 117 (PLI_NC_WEAPONADD) with:
-- Weapon name length (GByte) + weapon name (truncated to 223 bytes if longer)
-- Image name length (GByte) + image name (truncated to 223 bytes if longer)
+- Weapon name length (GByte) + weapon name; the current grclib sender does not truncate the supplied name, so callers must enforce a maximum of 223 bytes
+- Image name length (GByte) + image name; the current grclib sender does not truncate the supplied image name, so callers must enforce a maximum of 223 bytes
 - The script in WString format (newlines replaced by 0xA7, carriage returns stripped)
 
 **Example weapon script:**
@@ -272,7 +272,7 @@ function onCreated()
 ### Uploading a Class
 
 To upload a class, send packet 113 (PLI_NC_CLASSADD) with:
-- Class name length (GByte) + class name (truncated to 223 bytes if longer)
+- Class name length (GByte) + class name; the current grclib sender does not truncate the supplied name, so callers must enforce a maximum of 223 bytes
 - The script converted to CommaText format
 
 **Example class script:**
@@ -324,13 +324,13 @@ These are NPCs that only exist on a specific level. They're not in the database 
 Each packet 158 (PLO_NC_NPCADD) sent during login contains (from `sendLoginNC()` in TPlayerLogin.cpp):
 
 ```
-[NPC ID: GInt (4 bytes, 7-bit per byte)]    -- written as >> (int)npc->getId()
+[NPC ID: GInt3 / Int24 (3 bytes, 7-bit per byte)]    -- current grclib decodes PLO_NC_NPCADD this way
 [NPCPROP_NAME property: GByte ID + GString name]
 [NPCPROP_TYPE property: GByte ID + GString type]
 [NPCPROP_CURLEVEL property: GByte ID + GString level]
 ```
 
-**Correction:** The NPC ID in PLO_NC_NPCADD is encoded as a **4-byte GInt** (using the standard GInt encoding: 4 × 7-bit bytes each +32), not as the Int24 (3-byte) encoding. The Int24 encoding applies to packets that take an NPC ID as a request argument (PLI_NC_NPCGET, etc.), but the server's `>> (int)npc->getId()` operator in the add packet uses GInt (4 bytes). Verify using the actual packet length in your client.
+**Current grclib behavior:** The PLO_NC_NPCADD parser consumes a **3-byte GInt3/Int24** ID, matching the 3-byte request and mutation paths below. `IEnums.h` retains a generic `{INT id}` comment, so a separate 4-byte server-side encoding is not verified by this client library.
 
 **NPC ID encoding:**
 NPC IDs are stored as 3 bytes using a special encoding:
@@ -495,7 +495,7 @@ This is important - each type of script uses a different encoding:
 | Type | Packet | Encoding |
 |------|--------|----------|
 | Weapon | 192 | WString (0xA7 = newline) |
-| Class | 159/162 | CommaText (quoted lines, comma-separated) |
+| Class | 162 | CommaText (quoted lines, comma-separated) |
 | NPC | 160 | CommaText (same as classes) |
 
 **Weapons:** Replace newlines with 0xA7 when uploading, replace 0xA7 with newlines when downloading.
@@ -556,11 +556,11 @@ This is because symbols are treated as category 0, and alphanumeric as category 
 | 110 | PLI_NC_NPCFLAGSSET | Set NPC flags | NPC ID (Int24) + flags (CommaText) |
 | 111 | PLI_NC_NPCADD | Create NPC | "name,id,type,scripter,level,x,y" (CommaText) |
 | 112 | PLI_NC_CLASSEDIT | Get class script | Class name (raw string, no length prefix; 0x0A is the packet terminator) |
-| 113 | PLI_NC_CLASSADD | Upload class script | Class name length (GByte) + name + script (CommaText); name is truncated to 223 bytes if longer |
+| 113 | PLI_NC_CLASSADD | Upload class script | Class name length (GByte) + name + script (CommaText); current grclib does not enforce a 223-byte truncation |
 | 114 | PLI_NC_LOCALNPCSGET | Get level NPCs | Level name |
 | 115 | PLI_NC_WEAPONLISTGET | Get weapon list | (empty) |
 | 116 | PLI_NC_WEAPONGET | Get weapon script | Weapon name (raw string, no length prefix; 0x0A is the packet terminator) |
-| 117 | PLI_NC_WEAPONADD | Upload weapon script | Name length (GByte) + name + image length (GByte) + image + script (WString); name and image each truncated to 223 bytes if longer |
+| 117 | PLI_NC_WEAPONADD | Upload weapon script | Name length (GByte) + name + image length (GByte) + image + script (WString); current grclib does not enforce a 223-byte truncation |
 | 118 | PLI_NC_WEAPONDELETE | Delete weapon | Weapon name (raw string) |
 | 119 | PLI_NC_CLASSDELETE | Delete class | Class name (raw string) |
 | 150 | PLI_NC_LEVELLISTGET | Get level list | (empty) |
@@ -576,7 +576,7 @@ This is because symbols are treated as category 0, and alphanumeric as category 
 | 74 | PLO_RC_CHAT | NC chat message | Message |
 | 80 | PLO_NC_LEVELLIST | Level list response | Levels (CommaText) |
 | 157 | PLO_NC_NPCATTRIBUTES | NPC attributes response | Attributes (CommaText) |
-| 158 | PLO_NC_NPCADD | NPC added to list | NPC ID (GInt, 4 bytes) + NPCPROP_NAME (GByte ID + GString) + NPCPROP_TYPE (GByte ID + GString) + NPCPROP_CURLEVEL (GByte ID + GString) |
+| 158 | PLO_NC_NPCADD | NPC added to list | NPC ID (GInt3/Int24, 3 bytes in current grclib) + NPCPROP_NAME (GByte ID + GString) + NPCPROP_TYPE (GByte ID + GString) + NPCPROP_CURLEVEL (GByte ID + GString) |
 | 159 | PLO_NC_NPCDELETE | NPC deleted from list | NPC ID (Int24) |
 | 160 | PLO_NC_NPCSCRIPT | NPC script response | NPC ID (Int24) + script (CommaText) |
 | 161 | PLO_NC_NPCFLAGS | NPC flags response | NPC ID (Int24) + flags (CommaText) |
